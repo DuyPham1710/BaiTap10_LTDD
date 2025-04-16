@@ -18,6 +18,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.HashMap;
 
 import vn.duy.baitap10.ProfileActivity;
 import vn.duy.baitap10.R;
@@ -125,32 +129,112 @@ public class VideoFireBaseAdapter extends FirebaseRecyclerAdapter<VideoModel, Vi
             }
         });
 
-        holder.like.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!isLiked) {
-                    holder.like.setImageResource(R.drawable.ic_like_on);
-                    holder.dislike.setImageResource(R.drawable.ic_dislike_off);
-                    isLiked = true;
-                    isDisliked = false;
-                } else {
+//        holder.like.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (!isLiked) {
+//                    holder.like.setImageResource(R.drawable.ic_like_on);
+//                    holder.dislike.setImageResource(R.drawable.ic_dislike_off);
+//                    isLiked = true;
+//                    isDisliked = false;
+//                } else {
+//                    holder.like.setImageResource(R.drawable.ic_like_off);
+//                    isLiked = false;
+//                }
+//            }
+//        });
+//
+//        holder.dislike.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (!isDisliked) {
+//                    holder.dislike.setImageResource(R.drawable.ic_dislike_on);
+//                    holder.like.setImageResource(R.drawable.ic_like_off);
+//                    isDisliked = true;
+//                    isLiked = false;
+//                } else {
+//                    holder.dislike.setImageResource(R.drawable.ic_dislike_off);
+//                    isDisliked = false;
+//                }
+//            }
+//        });
+
+        holder.videoView.setOnCompletionListener(mp -> mp.start());
+
+        String videoId = getRef(position).getKey();
+        String userId = user.getId();
+        DatabaseReference videoRef = FirebaseDatabase.getInstance().getReference("videos_bai10").child(videoId);
+
+        // Cập nhật icon nếu user đã like/dislike
+        if (model.getLikes() != null && model.getLikes().containsKey(userId)) {
+            holder.like.setImageResource(R.drawable.ic_like_on);
+            holder.dislike.setImageResource(R.drawable.ic_dislike_off);
+        } else if (model.getDislikes() != null && model.getDislikes().containsKey(userId)) {
+            holder.like.setImageResource(R.drawable.ic_like_off);
+            holder.dislike.setImageResource(R.drawable.ic_dislike_on);
+        } else {
+            holder.like.setImageResource(R.drawable.ic_like_off);
+            holder.dislike.setImageResource(R.drawable.ic_dislike_off);
+        }
+
+        // Like
+        holder.like.setOnClickListener(v -> {
+            boolean isLiked = model.getLikes() != null && model.getLikes().containsKey(userId);
+
+            if (isLiked) {
+                videoRef.child("likes").child(userId).removeValue().addOnSuccessListener(unused -> {
                     holder.like.setImageResource(R.drawable.ic_like_off);
-                    isLiked = false;
+                    int count = model.getLikes().size() - 1;
+                    holder.tvlike.setText(String.valueOf(Math.max(0, count)));
+                    model.getLikes().remove(userId);
+                });
+            } else {
+                videoRef.child("likes").child(userId).setValue(true).addOnSuccessListener(unused -> {
+                    holder.like.setImageResource(R.drawable.ic_like_on);
+                    int count = (model.getLikes() != null ? model.getLikes().size() : 0) + 1;
+                    holder.tvlike.setText(String.valueOf(count));
+                    if (model.getLikes() == null) model.setLikes(new HashMap<>());
+                    model.getLikes().put(userId, true);
+                });
+
+                if (model.getDislikes() != null && model.getDislikes().containsKey(userId)) {
+                    videoRef.child("dislikes").child(userId).removeValue().addOnSuccessListener(unused -> {
+                        holder.dislike.setImageResource(R.drawable.ic_dislike_off);
+                        int count = model.getDislikes().size() - 1;
+                        holder.tvdislike.setText(String.valueOf(Math.max(0, count)));
+                        model.getDislikes().remove(userId);
+                    });
                 }
             }
         });
 
-        holder.dislike.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!isDisliked) {
-                    holder.dislike.setImageResource(R.drawable.ic_dislike_on);
-                    holder.like.setImageResource(R.drawable.ic_like_off);
-                    isDisliked = true;
-                    isLiked = false;
-                } else {
+        // Dislike
+        holder.dislike.setOnClickListener(v -> {
+            boolean isDisliked = model.getDislikes() != null && model.getDislikes().containsKey(userId);
+
+            if (isDisliked) {
+                videoRef.child("dislikes").child(userId).removeValue().addOnSuccessListener(unused -> {
                     holder.dislike.setImageResource(R.drawable.ic_dislike_off);
-                    isDisliked = false;
+                    int count = model.getDislikes().size() - 1;
+                    holder.tvdislike.setText(String.valueOf(Math.max(0, count)));
+                    model.getDislikes().remove(userId);
+                });
+            } else {
+                videoRef.child("dislikes").child(userId).setValue(true).addOnSuccessListener(unused -> {
+                    holder.dislike.setImageResource(R.drawable.ic_dislike_on);
+                    int count = (model.getDislikes() != null ? model.getDislikes().size() : 0) + 1;
+                    holder.tvdislike.setText(String.valueOf(count));
+                    if (model.getDislikes() == null) model.setDislikes(new HashMap<>());
+                    model.getDislikes().put(userId, true);
+                });
+
+                if (model.getLikes() != null && model.getLikes().containsKey(userId)) {
+                    videoRef.child("likes").child(userId).removeValue().addOnSuccessListener(unused -> {
+                        holder.like.setImageResource(R.drawable.ic_like_off);
+                        int count = model.getLikes().size() - 1;
+                        holder.tvlike.setText(String.valueOf(Math.max(0, count)));
+                        model.getLikes().remove(userId);
+                    });
                 }
             }
         });

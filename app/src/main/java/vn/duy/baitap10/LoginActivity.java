@@ -73,7 +73,7 @@ public class LoginActivity extends AppCompatActivity {
                                                     String avatarUrl = snapshot.child("avatarUrl").getValue(String.class);
                                                     String emailUser = snapshot.child("email").getValue(String.class);
 
-                                                    User userObj = new User(fullName, emailUser, avatarUrl);
+                                                    User userObj = new User(uid, fullName, emailUser, avatarUrl);
                                                     Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
                                                     Intent intent = new Intent(LoginActivity.this, VideoShortFirebaseActivity.class);
                                                     intent.putExtra("user", userObj);
