@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "546886609687",
+    "firebase_url": "https://videoshort-ba434-default-rtdb.firebaseio.com",
+    "project_id": "videoshort-ba434",
+    "storage_bucket": "videoshort-ba434.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:546886609687:android:75aa9dfb0847d88bc7a552",
+        "android_client_info": {
+          "package_name": "vn.duy.baitap10"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPVCYA8-kXPlXLahI6E8jdYiU5Chqppgw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:546886609687:android:b8f0697a5274ff83c7a552",
+        "android_client_info": {
+          "package_name": "vn.duy.shortsvideo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPVCYA8-kXPlXLahI6E8jdYiU5Chqppgw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
